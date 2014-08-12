@@ -8,7 +8,16 @@
 
 #import "ViewController.h"
 
-@interface ViewController ()
+@interface ViewController () <SocketIODelegate> {
+    SocketIO *socketIO;
+}
+
+@property (weak, nonatomic) IBOutlet UIButton *joinButton;
+@property (weak, nonatomic) IBOutlet UIButton *leaveButton;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
+
+- (IBAction)joinButtonPressed:(id)sender;
+- (IBAction)leaveButtonPressed:(id)sender;
 
 @end
 
@@ -42,6 +51,12 @@
     
     // connect to the socket.io server that is running locally at port 3000
     [socketIO connectToHost:@"localhost" onPort:3000];
+    
+    [self.activityIndicator startAnimating];
+    
+    socketIO.messageHandler = ^(SocketIOPacket *packet){
+        
+    };
 }
 
 # pragma mark -
@@ -107,4 +122,9 @@
 }
 
 
+- (IBAction)joinButtonPressed:(id)sender {
+}
+
+- (IBAction)leaveButtonPressed:(id)sender {
+}
 @end

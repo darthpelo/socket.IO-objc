@@ -9,9 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "SocketIO.h"
 
-@interface ViewController : UIViewController <SocketIODelegate>
-{
-    SocketIO *socketIO;
-}
+@interface ViewController : UIViewController
 
 @end
