@@ -205,7 +205,7 @@ NSString* const SocketIOException = @"SocketIOException";
     [self sendMessage:data withAcknowledge:nil];
 }
 
-- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function
+- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOAcknowledge)function
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"message"];
     packet.data = data;
@@ -218,7 +218,7 @@ NSString* const SocketIOException = @"SocketIOException";
     [self sendJSON:data withAcknowledge:nil];
 }
 
-- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function
+- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOAcknowledge)function
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"json"];
     packet.data = [SocketIOJSONSerialization JSONStringFromObject:data error:nil];
@@ -231,7 +231,7 @@ NSString* const SocketIOException = @"SocketIOException";
     [self sendEvent:eventName withData:data andAcknowledge:nil];
 }
 
-- (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function
+- (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOAcknowledge)function
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:eventName forKey:@"name"];
 
@@ -526,18 +526,18 @@ NSString* const SocketIOException = @"SocketIOException";
             case 3: {
                 DEBUGLOG(@"message");
                 if (packet.data && ![packet.data isEqualToString:@""]) {
-                    if ([_delegate respondsToSelector:@selector(socketIO:didReceiveMessage:)]) {
-                        [_delegate socketIO:self didReceiveMessage:packet];
-                    }
+                    if (self.messageHandler)
+                        self.messageHandler(packet);
+
                 }
                 break;
             }
             case 4: {
                 DEBUGLOG(@"json");
                 if (packet.data && ![packet.data isEqualToString:@""]) {
-                    if ([_delegate respondsToSelector:@selector(socketIO:didReceiveJSON:)]) {
-                        [_delegate socketIO:self didReceiveJSON:packet];
-                    }
+                    if (self.JSONHandler)
+                        self.JSONHandler(packet);
+
                 }
                 break;
             }
@@ -547,9 +547,9 @@ NSString* const SocketIOException = @"SocketIOException";
                     NSDictionary *json = [packet dataAsJSON];
                     packet.name = [json objectForKey:@"name"];
                     packet.args = [json objectForKey:@"args"];
-                    if ([_delegate respondsToSelector:@selector(socketIO:didReceiveEvent:)]) {
-                        [_delegate socketIO:self didReceiveEvent:packet];
-                    }
+                    if (self.eventHandler)
+                        self.eventHandler(packet);
+
                 }
                 break;
             }

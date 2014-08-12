@@ -25,7 +25,8 @@
 @class SocketIO;
 @class SocketIOPacket;
 
-typedef void(^SocketIOCallback)(id argsData);
+typedef void(^SocketIOAcknowledge)(id argsData);
+typedef void(^SocketIOCallback)(SocketIOPacket *packet);
 
 extern NSString* const SocketIOError;
 
@@ -100,6 +101,11 @@ typedef enum {
 @property (nonatomic, weak) id<SocketIODelegate> delegate;
 @property (nonatomic) BOOL returnAllDataFromAck;
 
+// Callback
+@property (nonatomic, copy) SocketIOCallback messageHandler;
+@property (nonatomic, copy) SocketIOCallback eventHandler;
+@property (nonatomic, copy) SocketIOCallback JSONHandler;
+
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params;
@@ -110,11 +116,11 @@ typedef enum {
 - (void) disconnectForced;
 
 - (void) sendMessage:(NSString *)data;
-- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
+- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOAcknowledge)function;
 - (void) sendJSON:(NSDictionary *)data;
-- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
+- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOAcknowledge)function;
 - (void) sendEvent:(NSString *)eventName withData:(id)data;
-- (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function;
+- (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOAcknowledge)function;
 - (void) sendAcknowledgement:(NSString*)pId withArgs:(NSArray *)data;
 
 - (void) setResourceName:(NSString *)name;
